@@ -1,0 +1,27 @@
+[metrics]
+#NAME|Optimize|Combination
+cost|MIN|ADD
+delay|MIN|ADD+1
+bandwidth|MAX|MIN
+
+[nodes]
+#NAME|description
+node1|Example Node1
+node2|Example Node2
+node3|Example Node3
+node4|Example Node4
+
+[edges]
+#SRCNAME|DSTNAME|METRIC=VALUE,METRIC=VALUE,...
+node1|node2|cost=10,delay=10,bandwidth=50
+node1|node3|cost=10,delay=30,bandwidth=50
+node1|node4|cost=10,delay=20,bandwidth=50
+node2|node1|cost=10,delay=10,bandwidth=30
+node2|node3|cost=10,delay=20,bandwidth=30
+node2|node4|cost=10,delay=20,bandwidth=30
+node3|node1|cost=10,delay=30,bandwidth=50
+node3|node2|cost=10,delay=20,bandwidth=30
+node3|node4|cost=10,delay=20,bandwidth=30
+node4|node1|cost=10,delay=20,bandwidth=50
+node4|node2|cost=10,delay=20,bandwidth=30
+node4|node3|cost=10,delay=20,bandwidth=30
