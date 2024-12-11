@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <omp.h>
 
 #include "global.h"
 #include "metrics.h"
@@ -22,15 +21,12 @@ int main(int argc, char *argv[]) {
   init_global_path_table();
   
   // Optimize each pair one source at a time
-  // This is where parallel programming would help
   printf("\nCalculating Updated Non-Dominated Path Lists\n");
   int nodecount = global_node_count();
 
-  // Optional omp used for speeding up the process
-  #pragma omp parallel for
+  // Process each source
   for (int i=0; i<nodecount; i++) {
-    char *nodename = get_global_node_name_by_index(i);
-    path_optimize_source(nodename);
+    path_optimize_source_id(i);
   }
 
   // Output the results

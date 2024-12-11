@@ -1,7 +1,7 @@
 #include <string.h>  // strncpy, strncmp
 #include <stdlib.h>  // malloc, free
 #include <stdbool.h> // true, false
-#include <stdio.h>   // printf
+#include <stdio.h>   // printf, stdin
 
 #include "global.h"
 #include "metrics.h"
@@ -359,6 +359,21 @@ int add_path_attempt(path_collection_struct *collection, path_struct *path) {
 }
 
 /*
+ * path_optimize_source_id - Tries to optimize all routes starting with the source by id
+ *
+ * Arguments:
+ *   id - Global node name index id
+ *
+ * Looks up the node name and calls the path_optimize_source function using the srcnode
+ * name instead of the id.
+ */
+void path_optimize_source_id(int id) {
+  char *nodename = get_global_node_name_by_index(id);
+  path_optimize_source(nodename);
+}
+
+
+/*
  * path_optimize_source - Tries to optimize all routes starting with the source
  *
  * Arguments:
@@ -369,7 +384,7 @@ int add_path_attempt(path_collection_struct *collection, path_struct *path) {
  * without finding any new optimized paths.
  */
 void path_optimize_source(char *srcname) {
-  printf("Optimizing Source %s\n", srcname);
+  if (DEBUG) printf("Optimizing Source %s\n", srcname);
   int changes = 0, status;
   int round = 0;
 
@@ -456,19 +471,28 @@ void write_optimized_paths(FILE *outfile) {
   for(global_node_struct *srcnode=global_nodes; srcnode != NULL; srcnode=srcnode->next) {
     for(global_node_struct *dstnode=global_nodes; dstnode != NULL; dstnode=dstnode->next) {
       if (srcnode == dstnode) continue;
-      fprintf(outfile, "%s|%s\n", srcnode->name, dstnode->name);
+      // Display the node pair
+      if (outfile == NULL) printf("%s|%s\n", srcnode->name, dstnode->name);
+      else fprintf(outfile, "%s|%s\n", srcnode->name, dstnode->name);
+      // Get the collection of pareto optimal routes
       collection = path_collection_lookup(srcnode->name, dstnode->name);
       for (path_struct *path=collection->optlist;path!=NULL; path=path->next) {
 	// Print out the metrics for the path
 	display_metrics(outfile, "", path->metrics, "|");
 	// print out the node list for the path
 	for(node_struct *node=path->nodes;node!=NULL;node=node->next) {
-	  fprintf(outfile, "%s", node->name);
-	  if (node->next != NULL) fprintf(outfile, ",");
+	  if (outfile == NULL) printf("%s", node->name);
+	  else fprintf(outfile, "%s", node->name);
+	  if (node->next != NULL) {
+	    if (outfile == NULL) printf(",");
+	    else fprintf(outfile, ",");
+	  }
 	}
-	fprintf(outfile, "\n"); // End of the non-dominated path entry
+	if (outfile == NULL) printf("\n");
+	else fprintf(outfile, "\n"); // End of the non-dominated path entry
       }
-      fprintf(outfile, "\n"); // Divide the pairs
+      if (outfile == NULL) printf("\n");
+      else fprintf(outfile, "\n"); // Divide the pairs
     }
   }
 }

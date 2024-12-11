@@ -148,12 +148,22 @@ metric_struct *add_metrics_node(metric_struct *current, char *name, double value
  * Prints out the prefix, then the metrics, then the postfix.
  */
 void display_metrics(FILE *outfile, char *prefix, metric_struct *metrics, char *postfix) {
-  fprintf(outfile, "%s", prefix);
+  // Prefix
+  if (outfile == NULL) printf("%s", prefix);
+  else fprintf(outfile, "%s", prefix);
+  // Metrics
   for (metric_struct *current = metrics; current != NULL; current = current->next) {
-    fprintf(outfile, "%s=%0.2f", current->name, current->value);
-    if (current->next != NULL) fprintf(outfile, ",");
+    if (outfile == NULL) {
+      printf("%s=%0.2f", current->name, current->value);
+      if (current->next != NULL) printf(",");
+    } else {
+      fprintf(outfile, "%s=%0.2f", current->name, current->value);
+      if (current->next != NULL) fprintf(outfile, ",");
+    }
   }
-  fprintf(outfile, "%s", postfix);
+  // Postfix
+  if (outfile == NULL) printf("%s", postfix);
+  else fprintf(outfile, "%s", postfix);
 }
 
 /*

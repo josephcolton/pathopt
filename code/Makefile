@@ -1,22 +1,30 @@
-CC =  /usr/bin/gcc
-CFLAGS  = -Wall -g -std=c99
-CFLAGS += -O3 -fopenmp -lm
-CFLAGS += -D_POSIX_C_SOURCE=200112L
+
+
+CC = gcc
+CFLAGS ?= -Wall -O3 -fPIC
 
 SRC  = $(notdir $(wildcard *.c)) 
-OBJS = $(addsuffix .o, $(basename $(SRC)))
+OBJS = global.o graph.o metrics.o parser.o paths.o
 EXEC = pathopt
+LIB = pathopt.so
 
-all: ${EXEC}
 
-${EXEC}: ${OBJS}
-	${CC} $^ -o $@ ${CFLAGS}
+all: ${EXEC} ${LIB}
+
+$(EXEC): ${OBJS}
+	$(CC) main.c $(OBJS) -o $(EXEC) $(CFLAGS)
 
 %.o : %.c
 	$(CC) -c $< -o $@ ${CFLAGS}
 
+pathopt.so: ${OBJS}
+	${CC} -shared -o ${LIB} -fPIC $(OBJS)
+
 clean:
 	rm -f *.o *.d *~ *.a *.so *.s ${EXEC}
 
-test:
-	OMP_NUM_THREADS=8 ./pathopt ../examples/simple-example.txt
+test: $(EXEC)
+	./pathopt ../examples/simple-example.txt
+
+testpy: $(LIB)
+	./pathopt.py ../examples/simple-example.txt

@@ -22,6 +22,7 @@ int duplicate_path(path_struct *first, path_struct *second);
 int clear_dominated_paths(path_collection_struct *collection);
 int add_path_attempt(path_collection_struct *collection, path_struct *path);
 void path_optimize_source(char *srcname);
+void path_optimize_source_id(int);
 path_collection_struct *path_collection_lookup(char *srcname, char *dstname);
 void write_optimized_paths(FILE *outfile);
 
